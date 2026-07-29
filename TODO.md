@@ -50,9 +50,24 @@ is the intent index).
       `url` in `config.json` from its LAN address to this bridge address fixed a
       "self-signed certificate in certificate chain" connection error and the client
       immediately preloaded existing scrobbles and resumed processing.
-- [ ] Configure at least one *real* source and confirm a scrobble actually lands end-to-end
-      (a client — Maloja — is already confirmed connected; still need a working source,
-      e.g. Jellyfin, Navidrome, or an OAuth source like Spotify).
+- [x] Configure at least one *real* source and confirm a scrobble actually lands end-to-end —
+      confirmed 2026-07-27 on the x86_64 test box: Navidrome configured as a ListenBrainz-
+      compatible endpoint source pointed at multi-scrobbler's LAN address. Required trusting
+      the StartOS root CA inside Navidrome's container (Alpine-based `deluan/navidrome` image,
+      mounting a combined CA bundle over `/etc/ssl/certs/ca-certificates.crt`) since StartOS
+      terminates TLS at the platform edge for every LAN interface regardless of the package's
+      declared internal `protocol`, so an external (non-StartOS) client always sees the
+      self-signed cert. Logs confirm the Navidrome source and both clients (Maloja,
+      ListenBrainz external) fully initialized and scrobble processing started.
 - [ ] Backup / restore sanity check — confirm OAuth tokens in `ms-auth.cache` survive
       restore without re-authorization.
-- [ ] Review README.md and instructions.md one more time against actual behavior.
+- [ ] Review README.md and instructions.md one more time against actual behavior. Known
+      drift to check: `README.md:75`'s import-related comments reference filenames —
+      confirm they still match `maloja-startos`'s `startos/actions/importScrobbles.ts`
+      exactly, since these were edited close together.
+- [ ] **Crash-loop bug, not yet root-caused or filed:** the container can end up with a
+      stray `s6-supervise svc-node` respawn loop (`EACCES` on `/tmp/tsx-*.pipe`, or later
+      `unable to spawn ./run`) if a stop/start is issued while a prior stop is still in
+      flight. The real daemon keeps serving through it, so it's silent unless you check
+      logs. Workaround is `start-cli package rebuild <id>` (clean fix, no data loss). Worth
+      a proper fix, or at minimum filing it, before release.
