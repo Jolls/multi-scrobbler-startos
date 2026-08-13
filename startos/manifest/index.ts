@@ -12,10 +12,10 @@ export const manifest = setupManifest({
   description: { short, long },
   volumes: ['config'],
   images: {
-    // Confirmed on Docker Hub 2026-07-26: foxxmd/multi-scrobbler:0.14.2 ships
+    // Confirmed on Docker Hub 2026-08-13: foxxmd/multi-scrobbler:0.16.4 ships
     // both amd64 and arm64. See UPDATING.md for how to re-check this on bump.
     'multi-scrobbler': {
-      source: { dockerTag: 'foxxmd/multi-scrobbler:0.14.2' },
+      source: { dockerTag: 'foxxmd/multi-scrobbler:0.16.4' },
       arch: ['x86_64', 'aarch64'],
     },
   },
