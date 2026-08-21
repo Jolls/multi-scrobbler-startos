@@ -13,9 +13,19 @@ is the intent index).
       on 2026-07-26: image logs "User UID: 1000 / User GID: 1000" and starts cleanly with
       the pinned values in `startos/main.ts`.
 - [x] `BASE_URL` is derived from the enabled `ui` interface address in `startos/main.ts`.
-      Confirmed on a real install (2026-07-26): app log shows
-      "User-defined base URL for UI and redirect URLs (spotify, deezer, lastfm):
-      http://10.0.3.1:9078/", matching the enabled LAN address.
+      The 2026-07-26 note here ("http://10.0.3.1:9078/, matching the enabled LAN address")
+      was wrong — 10.0.3.1 is the LXC bridge address, not a LAN address, and was never
+      checked against what it actually was. Found and fixed 2026-08-21 while debugging why
+      Last.fm OAuth wouldn't complete on `multi-scrobbler-test`: the unfiltered
+      `addressInfo.format('urlstring')[0]` picked the bridge address, which timed out when
+      the browser tried to load the OAuth callback against it (only reachable
+      container-to-container, never from a real browser). Fixed by using `.nonLocal`
+      (excludes bridge/localhost/link-local) and preferring the mDNS `.local` hostname when
+      present, since address order among several non-local candidates (LAN NIC, WireGuard
+      tunnel, etc.) isn't otherwise meaningful. Verified end-to-end 2026-08-21: Last.fm auth
+      completed via the mDNS address for a LAN browser; a WireGuard-connected browser needed
+      to override `redirectUri` manually to the LAN IP instead (documented as a known
+      limitation in README, since mDNS doesn't resolve off-LAN).
 
 ## The service (config)
 
@@ -60,8 +70,16 @@ is the intent index).
       self-signed cert. Logs confirm the Navidrome source and both clients (Maloja,
       ListenBrainz external) fully initialized and scrobble processing started.
 - [ ] Backup / restore sanity check — confirm OAuth tokens in `ms-auth.cache` survive
-      restore without re-authorization. Needs a StartOS box (backup requires the server's
-      encryption password).
+      restore without re-authorization. Attempted 2026-08-21: backup/restore of
+      `multi-scrobbler-test` came back up clean, but proves nothing about OAuth survival —
+      that instance has never had a `config.json` or `ms-auth.cache` (empty shell, no
+      sources/clients ever configured). Checked production (`multi-scrobbler`) as a
+      stand-in too: its real config only uses `endpointlz` (Navidrome), `maloja` (×2), and
+      `listenbrainz` — none of which are OAuth-based, and it has no `ms-auth.cache` either.
+      There is currently no OAuth data anywhere on the test box to validate against. Closing
+      this out for real requires configuring an actual OAuth-flow source (Spotify, Last.fm,
+      or Deezer — needs registering an API app with that service and completing a real
+      consent screen), then backup/restore/confirm-no-reauth on that.
 - [x] Reviewed README.md against the current `writing-readmes.md` heading set/order
       (2026-08-20) — rewrote to add the required **File Models** and **Tasks** sections
       (both missing), reorder into the four required groups, rename **Actions (StartOS
@@ -88,8 +106,12 @@ is the intent index).
       recurrence across 8 attempts (single node process each time, no orphaned supervisors,
       clean logs). Not a formal proof the race can never occur; leave #3 open a little
       longer for everyday-usage confirmation before closing.
-- [ ] **Community Registry submission** (see `publishing.md`): once the two box-dependent
-      items above are resolved, email <submissions@start9.com> with a link to
+- [x] Fresh-install sanity check of the fixed build — `multi-scrobbler-test` reinstalled
+      and started clean (2026-08-21 19:52): boot → migrations → transformers → web server →
+      scheduler, no errors. Confirmed the fix works from a cold install, not just across a
+      sideload-in-place.
+- [ ] **Community Registry submission** (see `publishing.md`): once the box-dependent item
+      above (backup/restore) is resolved, email <submissions@start9.com> with a link to
       github.com/Jolls/multi-scrobbler-startos. Start9 forks it into Start9-Community;
       after that, `packageRepo` in `startos/manifest/index.ts` gets repointed to the fork
       (matching what `navidrome-startos` did) and further changes go through PRs against

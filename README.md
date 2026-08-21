@@ -155,7 +155,20 @@ re-authorization is normally not required.
 
 1. `BASE_URL` is derived automatically from the service's own enabled Web Interface address
    and reapplied on every restart; it cannot currently be pinned to a specific address
-   independent of interface state.
+   independent of interface state. Among the non-bridge addresses available,
+   `startos/main.ts` prefers the mDNS (`.local`) hostname when one is enabled, since it
+   resolves consistently for any device on the LAN regardless of which physical interface
+   answers — a private IPv4/IPv6 address is picked otherwise, in unspecified order among
+   however many the box has (LAN NIC, WireGuard tunnel, etc). This matters for the
+   `redirectUri` that OAuth-based sources/clients (Spotify, Last.fm, Deezer) derive from
+   `BASE_URL` by default: **the browser completing that provider's auth flow must be able to
+   resolve/reach whatever address was picked.** A user configuring OAuth while connected
+   over WireGuard (or Tor, or a public domain) rather than the plain LAN may find the
+   mDNS-derived callback times out, since `.local` names don't resolve off the LAN segment.
+   The fix is to override that source/client's `redirectUri` explicitly in `config.json`
+   with an address reachable from wherever the browser actually is (confirmed working
+   2026-08-21: WireGuard-connected browser, `redirectUri` manually set to the box's LAN IP,
+   completed the Last.fm auth flow that the default mDNS address could not reach).
 2. `PUID`/`PGID` are fixed at `1000:1000` rather than user-configurable.
 3. The **Edit config.json** action validates only that the submission is JSON with
    array-typed `sources`/`clients`, not the fields of individual source/client entries — a
