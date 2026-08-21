@@ -34,6 +34,11 @@ you're comfortable exposing it on.
 3. Submitting the action restarts the service automatically to apply the new config — no
    separate restart needed.
 4. For sources that use OAuth (Spotify, Last.fm, YouTube Music), open the dashboard —
-   it shows an authorization link for each one that still needs it.
+   it shows an authorization link for each one that still needs it. Complete the
+   authorization from a browser on the **same local network** as this StartOS box — the
+   callback address is chosen automatically and may not be reachable if you're connected
+   over WireGuard, Tor, or a public clearnet domain. If authorization stalls/times out
+   from a remote connection, set that source/client's `redirectUri` explicitly (via
+   **Edit config.json**) to an address reachable from wherever your browser actually is.
 5. Once a source is authorized and a client is configured, plays start showing up on the
    dashboard and scrobbling to your configured clients automatically.
