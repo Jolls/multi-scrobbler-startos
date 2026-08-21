@@ -72,13 +72,22 @@ is the intent index).
       `README.md:75`/`importScrobbles.ts` drift this item used to flag no longer exists —
       the referenced import content was already gone from both docs. `instructions.md` not
       yet re-reviewed against this pass.
-- [ ] **Crash-loop bug, filed as #3, not yet root-caused:** the container can end up with a
-      stray `s6-supervise svc-node` respawn loop (`EACCES` on `/tmp/tsx-*.pipe`, or later
-      `unable to spawn ./run`) if a stop/start is issued while a prior stop is still in
-      flight. The real daemon keeps serving through it, so it's silent unless you check
-      logs. Workaround is `start-cli package rebuild <id>` (clean fix, no data loss).
-      Needs a reproduction on a StartOS box (exact race window, logs, StartOS version) to
-      root-cause and close out — see the issue for what's still missing.
+- [x] **Crash-loop bug, #3, mitigation verified, leaving open briefly for real-world
+      confirmation:** the container could end up with a stray `s6-supervise svc-node`
+      respawn loop if a stop/start was issued while a prior stop was still in flight. A
+      claimed `start-technologies` filing from the 2026-08-21 reproduction was never
+      actually posted (no such issue exists — retracted). Extracting the upstream image
+      showed multi-scrobbler only flushes its DB on `SIGINT`, not `SIGTERM` (s6's default
+      stop signal), so every platform stop was already hitting the app ungracefully —
+      likely why this reproduced here and not on other s6-based packages tested. Mitigation
+      shipped: `assets/svc-node-down-signal` mounted over s6-rc's `down-signal` file for
+      `svc-node`, so stop now asks s6 to deliver `SIGINT` (see README "Image and Container
+      Runtime"). Verified on the test box (2026-08-21): sideloaded as `multi-scrobbler-test`,
+      confirmed the mount landed, then repeated the original trigger — including 5 fully
+      concurrent stop+start pairs, tighter timing than the original ~1-2s trigger — with no
+      recurrence across 8 attempts (single node process each time, no orphaned supervisors,
+      clean logs). Not a formal proof the race can never occur; leave #3 open a little
+      longer for everyday-usage confirmation before closing.
 - [ ] **Community Registry submission** (see `publishing.md`): once the two box-dependent
       items above are resolved, email <submissions@start9.com> with a link to
       github.com/Jolls/multi-scrobbler-startos. Start9 forks it into Start9-Community;

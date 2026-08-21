@@ -22,12 +22,23 @@ export const main = sdk.setupMain(async ({ effects }) => {
     subcontainer: sdk.SubContainer.of(
       effects,
       { imageId: 'multi-scrobbler' },
-      sdk.Mounts.of().mountVolume({
-        volumeId: 'config',
-        subpath: null,
-        mountpoint: '/config',
-        readonly: false,
-      }),
+      sdk.Mounts.of()
+        .mountVolume({
+          volumeId: 'config',
+          subpath: null,
+          mountpoint: '/config',
+          readonly: false,
+        })
+        // multi-scrobbler's node process only flushes its DB connection on
+        // SIGINT (not SIGTERM, s6's default stop signal), so a platform
+        // stop kills it ungracefully. This overrides s6-rc's down-signal
+        // for svc-node so a stop delivers SIGINT instead — see
+        // github.com/Jolls/multi-scrobbler-startos/issues/3.
+        .mountAssets({
+          subpath: 'svc-node-down-signal',
+          mountpoint: '/etc/s6-overlay/s6-rc.d/svc-node/down-signal',
+          type: 'file',
+        }),
       'multi-scrobbler-sub',
     ),
     exec: {

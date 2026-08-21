@@ -41,6 +41,14 @@ Unmodified upstream image (`foxxmd/multi-scrobbler`), built on linuxserver.io's
 (`sdk.useEntrypoint()` + `runAsInit: true`), so s6-overlay starts the same way it does
 outside StartOS.
 
+The upstream node process only flushes its database connection on `SIGINT` — it has no
+`SIGTERM` handler, so s6's default stop signal kills it ungracefully. `startos/main.ts`
+mounts `assets/svc-node-down-signal` (contents: `SIGINT`) over s6-rc's
+`/etc/s6-overlay/s6-rc.d/svc-node/down-signal`, overriding the signal s6 sends the node
+process on stop, without modifying the upstream image. See
+[issue #3](https://github.com/Jolls/multi-scrobbler-startos/issues/3) for the crash-loop
+bug this was investigated for.
+
 ## Volume and Data Layout
 
 Where the service's data lives.
