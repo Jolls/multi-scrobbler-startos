@@ -19,14 +19,6 @@ export const manifest = setupManifest({
       arch: ['x86_64', 'aarch64'],
     },
   },
-  alerts: {
-    install: null,
-    update: null,
-    uninstall: null,
-    restore: null,
-    start: null,
-    stop: null,
-  },
   dependencies: {
     // Optional: multi-scrobbler works fine with any client (or none), but
     // when Maloja is used as a client, its config.json "url" must point at
