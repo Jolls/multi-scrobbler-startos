@@ -69,17 +69,19 @@ is the intent index).
       declared internal `protocol`, so an external (non-StartOS) client always sees the
       self-signed cert. Logs confirm the Navidrome source and both clients (Maloja,
       ListenBrainz external) fully initialized and scrobble processing started.
-- [ ] Backup / restore sanity check — confirm OAuth tokens in `ms-auth.cache` survive
-      restore without re-authorization. Attempted 2026-08-21: backup/restore of
-      `multi-scrobbler-test` came back up clean, but proves nothing about OAuth survival —
-      that instance has never had a `config.json` or `ms-auth.cache` (empty shell, no
-      sources/clients ever configured). Checked production (`multi-scrobbler`) as a
-      stand-in too: its real config only uses `endpointlz` (Navidrome), `maloja` (×2), and
-      `listenbrainz` — none of which are OAuth-based, and it has no `ms-auth.cache` either.
-      There is currently no OAuth data anywhere on the test box to validate against. Closing
-      this out for real requires configuring an actual OAuth-flow source (Spotify, Last.fm,
-      or Deezer — needs registering an API app with that service and completing a real
-      consent screen), then backup/restore/confirm-no-reauth on that.
+- [x] Backup / restore sanity check — confirm OAuth tokens survive restore without
+      re-authorization. First attempt (2026-08-21) proved nothing: `multi-scrobbler-test`
+      had never had a real `config.json`/OAuth data, and production's config
+      (`endpointlz`/`maloja`/`listenbrainz`) doesn't use OAuth at all. Closed out for real
+      2026-08-21 by configuring a genuine Last.fm source on `multi-scrobbler-test`,
+      completing the actual browser OAuth flow (which needed the BASE_URL fix above to
+      even work), then backing up and restoring that instance. Confirmed:
+      `currentCreds-lastfm-Foxx LFM Source.json` came back with its original
+      pre-backup mtime and the exact same `sessionKey`/`anonpleb2` — not regenerated —
+      and the source went straight to "Client authorized for user anonpleb2" /
+      "Fully Initialized!" on boot with zero user interaction. Note: multi-scrobbler
+      stores OAuth state in one `currentCreds-<type>-<name>.json` file per
+      source/client, not the single `ms-auth.cache` this item originally assumed.
 - [x] Reviewed README.md against the current `writing-readmes.md` heading set/order
       (2026-08-20) — rewrote to add the required **File Models** and **Tasks** sections
       (both missing), reorder into the four required groups, rename **Actions (StartOS
@@ -110,8 +112,8 @@ is the intent index).
       and started clean (2026-08-21 19:52): boot → migrations → transformers → web server →
       scheduler, no errors. Confirmed the fix works from a cold install, not just across a
       sideload-in-place.
-- [ ] **Community Registry submission** (see `publishing.md`): once the box-dependent item
-      above (backup/restore) is resolved, email <submissions@start9.com> with a link to
+- [ ] **Community Registry submission** (see `publishing.md`): all box-dependent items
+      above are resolved — email <submissions@start9.com> with a link to
       github.com/Jolls/multi-scrobbler-startos. Start9 forks it into Start9-Community;
       after that, `packageRepo` in `startos/manifest/index.ts` gets repointed to the fork
       (matching what `navidrome-startos` did) and further changes go through PRs against
