@@ -21,27 +21,29 @@ full list of supported sources and clients.
 
 - [Image and Container Runtime](#image-and-container-runtime)
 - [Volume and Data Layout](#volume-and-data-layout)
-- [Installation and First-Run Flow](#installation-and-first-run-flow)
-- [Configuration Management](#configuration-management)
-- [Network Access and Interfaces](#network-access-and-interfaces)
-- [Actions (StartOS UI)](#actions-startos-ui)
-- [Backups and Restore](#backups-and-restore)
-- [Health Checks](#health-checks)
+- [File Models](#file-models)
 - [Dependencies](#dependencies)
+- [Network Access and Interfaces](#network-access-and-interfaces)
+- [Installation and First-Run Flow](#installation-and-first-run-flow)
+- [Actions](#actions)
+- [Tasks](#tasks)
+- [Health Checks](#health-checks)
+- [Backups and Restore](#backups-and-restore)
 - [Limitations and Differences](#limitations-and-differences)
-- [What Is Unchanged from Upstream](#what-is-unchanged-from-upstream)
-- [Contributing](#contributing)
 
 ---
 
 ## Image and Container Runtime
 
 Unmodified upstream image (`foxxmd/multi-scrobbler`), built on linuxserver.io's
-`baseimage-debian` (s6-overlay). Ships `amd64` and `arm64`. The daemon runs the image's
-own entrypoint as PID 1 (`sdk.useEntrypoint()` + `runAsInit: true`), so s6-overlay starts
-the same way it does outside StartOS.
+`baseimage-debian` (s6-overlay). Ships `amd64` and `arm64`. The daemon runs in the
+`multi-scrobbler-sub` subcontainer, running the image's own entrypoint as PID 1
+(`sdk.useEntrypoint()` + `runAsInit: true`), so s6-overlay starts the same way it does
+outside StartOS.
 
 ## Volume and Data Layout
+
+Where the service's data lives.
 
 | Volume | Mount point | Contents |
 | ------ | ----------- | -------- |
@@ -50,23 +52,30 @@ the same way it does outside StartOS.
 `CONFIG_DIR` and `DATA_DIR` both point at `/config`, matching the upstream Docker image's
 own layout.
 
-## Installation and First-Run Flow
+## File Models
 
-No wizard is skipped and no credentials are auto-generated — multi-scrobbler has no login
-of its own (see [Network Access and Interfaces](#network-access-and-interfaces)). On first
-boot the app creates `ms.db` on its own; you then add sources/clients through the
-**Edit config.json** action (see [Actions](#actions-startos-ui)) or via environment
-variables, per the [upstream configuration docs](https://docs.multi-scrobbler.app/configuration/).
-Sources that use OAuth (Spotify, Last.fm, YouTube Music) are authorized from a link on the
-dashboard after startup.
+`config.json`, at `/config/config.json`, is modeled as raw text (`FileHelper.string`), not
+a typed schema — upstream's own shape (30+ source types, 8 client types) is too large to
+mirror and keep in sync. Nothing seeds it: no file exists on disk until the **Edit
+config.json** action is run for the first time, at which point it becomes entirely
+user-owned — nothing StartOS-managed rewrites it afterward, and a hand edit made outside
+the action (e.g. over SSH) survives untouched until the next action submission. The daemon
+reads it once at startup only; `startos/main.ts` watches the file reactively and restarts
+the daemon whenever the action writes a new version, since multi-scrobbler itself does not
+pick up config changes on a running process.
 
-## Configuration Management
+## Dependencies
 
-| StartOS-Managed | Upstream-Managed |
-| ---------------- | ---------------- |
-| `PORT`, `CONFIG_DIR`, `DATA_DIR`, `PUID`, `PGID`, `TZ`, `BASE_URL` (derived from the enabled Web Interface address) | Everything else: sources, clients, retention, caching — via the `config.json` content submitted through the **Edit config.json** action, or additional env vars per upstream docs |
+What this service needs from other services.
+
+- **Maloja** (`maloja`) — optional. multi-scrobbler works standalone or with any other
+  client; this dependency only matters if you add a Maloja client to `config.json`.
+  `kind: 'running'`, `healthChecks: ['maloja']`. No volumes are mounted from it — connection
+  is over the network only, via the **Get Maloja Connection Info** action.
 
 ## Network Access and Interfaces
+
+What the service exposes.
 
 | Interface | Port | Protocol | Purpose |
 | --------- | ---- | -------- | ------- |
@@ -75,7 +84,22 @@ dashboard after startup.
 Reachable via whatever LAN/Tor/clearnet addresses the user enables in the Interfaces tab,
 same as any other StartOS service.
 
-## Actions (StartOS UI)
+## Installation and First-Run Flow
+
+No wizard is skipped and no credentials are auto-generated — multi-scrobbler has no login
+of its own (see [Network Access and Interfaces](#network-access-and-interfaces)). On first
+boot the app creates `ms.db` on its own; you then add sources/clients through the
+**Edit config.json** action (see [Actions](#actions)) or via environment variables, per the
+[upstream configuration docs](https://docs.multi-scrobbler.app/configuration/). `PORT`,
+`CONFIG_DIR`, `DATA_DIR`, `PUID`, `PGID`, `TZ`, and `BASE_URL` (derived from the enabled Web
+Interface address) are StartOS-managed; everything else — sources, clients, retention,
+caching — is upstream-managed via `config.json` or additional env vars. Sources that use
+OAuth (Spotify, Last.fm, YouTube Music) are authorized from a link on the dashboard after
+startup.
+
+## Actions
+
+What can be done to the service, and when.
 
 - **Edit config.json** (`edit-config`) — a single `textarea` action holding the raw
   `config.json` content, in the same format as [upstream's own schema](https://docs.multi-scrobbler.app/configuration/)
@@ -83,9 +107,11 @@ same as any other StartOS service.
   structured form: the handler only checks that the submission is valid JSON and that
   `sources`/`clients`, if present, are arrays — it does not validate individual source or
   client fields (30+ source types and 8 client types make that impractical to mirror and
-  keep in sync). Prefilled from the file on disk, or a `{ "sources": [], "clients": [] }`
-  skeleton on first run. Available any time; writing a new config restarts the daemon to
-  apply it (`startos/main.ts` watches `config.json` reactively).
+  keep in sync). A wrong per-source field will save without a StartOS-level error and
+  surface only as an app-level error in the logs/dashboard once the daemon restarts.
+  Prefilled from the file on disk, or a `{ "sources": [], "clients": [] }` skeleton on
+  first run. Available any time; writing a new config restarts the daemon to apply it.
+  Safe to re-run — it always overwrites with exactly what was submitted.
 - **Get Maloja Connection Info** (`maloja-connection-info`) — resolves the Maloja
   dependency's inter-container bridge address (`sdk.host.getBridgeAddress`, per
   [Service-to-Service Networking](https://docs.start9.com/packaging/service-to-service.html))
@@ -93,13 +119,13 @@ same as any other StartOS service.
   `config.json`. Necessary because `localhost` doesn't reach another service's container,
   and the LAN address goes through StartOS's reverse proxy with a self-signed cert that
   multi-scrobbler's TLS validation rejects — the bridge address is the one that actually
-  works. Returns an informational "not available" result if Maloja isn't installed/running.
+  works. Read-only and safe to re-run at any time. Returns an informational "not available"
+  result if Maloja isn't installed/running, rather than an error.
 
-## Backups and Restore
+## Tasks
 
-The entire `config` volume is backed up (config, database, and auth token cache). Restoring
-a backup restores sources/clients and play history exactly as they were; OAuth tokens in
-`ms-auth.cache` are restored too, so re-authorization is normally not required.
+None — the package raises no tasks. The service's ordinary controls are always available,
+and nothing blocks it from starting.
 
 ## Health Checks
 
@@ -107,14 +133,15 @@ a backup restores sources/clients and play history exactly as they were; OAuth t
 Upstream also exposes `GET /api/health`, which reflects per-source/client connectivity;
 that endpoint is not used for the StartOS readiness check because it can legitimately
 return a non-200 status while sources are still being configured/authorized, which would
-otherwise read as a crash.
+otherwise read as a crash. A failure here means the web server itself never bound its
+port — check the container logs for a startup error, not source/client connectivity.
 
-## Dependencies
+## Backups and Restore
 
-- **Maloja** (`maloja`) — optional. multi-scrobbler works standalone or with any other
-  client; this dependency only matters if you add a Maloja client to `config.json`.
-  `kind: 'running'`, `healthChecks: ['maloja']`. No volumes are mounted from it — connection
-  is over the network only, via the **Get Maloja Connection Info** action.
+The entire `config` volume is backed up (config, database, and auth token cache) — a
+wholesale volume copy, not a database dump. Restoring a backup restores sources/clients and
+play history exactly as they were; OAuth tokens in `ms-auth.cache` are restored too, so
+re-authorization is normally not required.
 
 ## Limitations and Differences
 
@@ -128,29 +155,19 @@ otherwise read as a crash.
    for a given source type) will save without a StartOS-level error, surfacing instead as
    an app-level error in the logs/dashboard once the daemon restarts.
 
-## What Is Unchanged from Upstream
-
-Source/client configuration (`config.json` schema and supported services), the SQLite
-play-history database, retention/compaction behavior, and the dashboard/API itself all
-work exactly as documented upstream.
-
-## Contributing
-
-See [AGENTS.md](AGENTS.md).
-
 ---
 
 ## Quick Reference for AI Consumers
 
 ```yaml
 package_id: multi-scrobbler
+image: foxxmd/multi-scrobbler
 architectures: [x86_64, aarch64]
+subcontainers: [multi-scrobbler-sub]
 volumes:
   config: /config
-ports:
-  ui: 9078
-dependencies:
-  - maloja (optional)
+file_models:
+  - config.json
 startos_managed_env_vars:
   - PORT
   - CONFIG_DIR
@@ -159,7 +176,14 @@ startos_managed_env_vars:
   - PGID
   - TZ
   - BASE_URL
+dependencies:
+  - maloja (optional)
+interfaces:
+  ui: { type: ui, port: 9078 }
 actions:
   - edit-config
   - maloja-connection-info
+tasks: none
+health_checks:
+  - checkPortListening
 ```

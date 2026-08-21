@@ -60,14 +60,28 @@ is the intent index).
       self-signed cert. Logs confirm the Navidrome source and both clients (Maloja,
       ListenBrainz external) fully initialized and scrobble processing started.
 - [ ] Backup / restore sanity check — confirm OAuth tokens in `ms-auth.cache` survive
-      restore without re-authorization.
-- [ ] Review README.md and instructions.md one more time against actual behavior. Known
-      drift to check: `README.md:75`'s import-related comments reference filenames —
-      confirm they still match `maloja-startos`'s `startos/actions/importScrobbles.ts`
-      exactly, since these were edited close together.
-- [ ] **Crash-loop bug, not yet root-caused or filed:** the container can end up with a
+      restore without re-authorization. Needs a StartOS box (backup requires the server's
+      encryption password).
+- [x] Reviewed README.md against the current `writing-readmes.md` heading set/order
+      (2026-08-20) — rewrote to add the required **File Models** and **Tasks** sections
+      (both missing), reorder into the four required groups, rename **Actions (StartOS
+      UI)** to **Actions**, and drop the disallowed **Configuration Management**, **What Is
+      Unchanged from Upstream**, and **Contributing** sections (folded into other required
+      sections or removed as out-of-scope, matching the treatment `navidrome-startos` got in
+      its own audit, Start9-Community/navidrome-startos#1). The stale
+      `README.md:75`/`importScrobbles.ts` drift this item used to flag no longer exists —
+      the referenced import content was already gone from both docs. `instructions.md` not
+      yet re-reviewed against this pass.
+- [ ] **Crash-loop bug, filed as #3, not yet root-caused:** the container can end up with a
       stray `s6-supervise svc-node` respawn loop (`EACCES` on `/tmp/tsx-*.pipe`, or later
       `unable to spawn ./run`) if a stop/start is issued while a prior stop is still in
       flight. The real daemon keeps serving through it, so it's silent unless you check
-      logs. Workaround is `start-cli package rebuild <id>` (clean fix, no data loss). Worth
-      a proper fix, or at minimum filing it, before release.
+      logs. Workaround is `start-cli package rebuild <id>` (clean fix, no data loss).
+      Needs a reproduction on a StartOS box (exact race window, logs, StartOS version) to
+      root-cause and close out — see the issue for what's still missing.
+- [ ] **Community Registry submission** (see `publishing.md`): once the two box-dependent
+      items above are resolved, email <submissions@start9.com> with a link to
+      github.com/Jolls/multi-scrobbler-startos. Start9 forks it into Start9-Community;
+      after that, `packageRepo` in `startos/manifest/index.ts` gets repointed to the fork
+      (matching what `navidrome-startos` did) and further changes go through PRs against
+      the fork, not this repo directly.
