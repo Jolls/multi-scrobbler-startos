@@ -1,88 +1,123 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.18.1:0',
+  version: '0.19.2:0',
   releaseNotes: {
-    en_US: `Updated Multi-Scrobbler to 0.18.1.
+    en_US: `Updated Multi-Scrobbler to 0.19.2.
 
 **Features**
 
-- New web interface, replacing the previous dashboard
-- The MusicBrainz transformer's \`contact\` field is now optional
-- MusicBrainz rate limits can be set per server, and requests are spread across your servers
+- The MusicBrainz transformer is now built in and works without any setup
+- New Rocksky, Spotify and Cover Art Archive transformers
+- The Rocksky client writes scrobbles directly to your PDS and supports Now Playing
+- Teal.fm and Rocksky sources no longer need an app password
+- ListenBrainz and Koito clients can submit scrubbed device info
+- MusicBrainz can exclude audiobooks and music videos
+- Smaller Docker image
 
 **Fixes**
 
-- Plex artwork displays again
-- Duplicate plays can be filtered in a source's play list
+- Fixed a transformer startup race condition and noisy startup logging
 
-The first start after updating recalculates an identifier for every stored play, so it takes longer with a large play history.
+**Before you update**
 
-[Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    es_ES: `Multi-Scrobbler actualizado a 0.18.1.
+- Rocksky: API key authentication is removed and access tokens are deprecated. Switch to handle and app password.
+- Discord: automatic Cover Art Archive artwork is deprecated. Add the \`coverartarchive\` transform to your Discord client instead.
+- Transforms: if you use the \`MSDefault\` name and also configure transforms through environment variables, rename it to \`MSEnv\`.
+
+[Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
+    es_ES: `Multi-Scrobbler actualizado a 0.19.2.
 
 **Novedades**
 
-- Nueva interfaz web, que sustituye al panel anterior
-- El campo \`contact\` del transformador de MusicBrainz ahora es opcional
-- Los límites de tasa de MusicBrainz se pueden fijar por servidor, y las solicitudes se reparten entre tus servidores
+- El transformador de MusicBrainz ahora está integrado y funciona sin configuración
+- Nuevos transformadores de Rocksky, Spotify y Cover Art Archive
+- El cliente de Rocksky escribe los scrobbles directamente en tu PDS y admite Now Playing
+- Las fuentes Teal.fm y Rocksky ya no necesitan contraseña de aplicación
+- Los clientes ListenBrainz y Koito pueden enviar información de dispositivo depurada
+- MusicBrainz puede excluir audiolibros y videos musicales
+- Imagen de Docker más pequeña
 
 **Correcciones**
 
-- Las carátulas de Plex vuelven a mostrarse
-- Las reproducciones duplicadas se pueden filtrar en la lista de reproducciones de una fuente
+- Se corrigió una condición de carrera al iniciar los transformadores y el registro ruidoso al arrancar
 
-El primer inicio tras la actualización recalcula un identificador para cada reproducción guardada, por lo que tarda más con un historial grande.
+**Antes de actualizar**
 
-[Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    de_DE: `Multi-Scrobbler auf 0.18.1 aktualisiert.
+- Rocksky: se elimina la autenticación con clave de API y los tokens de acceso quedan obsoletos. Cambia a usuario y contraseña de aplicación.
+- Discord: la carátula automática de Cover Art Archive queda obsoleta. Añade en su lugar la transformación \`coverartarchive\` a tu cliente de Discord.
+- Transformaciones: si usas el nombre \`MSDefault\` y también configuras transformaciones mediante variables de entorno, cámbialo a \`MSEnv\`.
+
+[Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
+    de_DE: `Multi-Scrobbler auf 0.19.2 aktualisiert.
 
 **Neuerungen**
 
-- Neue Weboberfläche, die das bisherige Dashboard ersetzt
-- Das Feld \`contact\` des MusicBrainz-Transformers ist jetzt optional
-- MusicBrainz-Ratenlimits lassen sich pro Server festlegen, und Anfragen werden auf deine Server verteilt
+- Der MusicBrainz-Transformer ist jetzt integriert und funktioniert ohne Einrichtung
+- Neue Transformer für Rocksky, Spotify und Cover Art Archive
+- Der Rocksky-Client schreibt Scrobbles direkt in dein PDS und unterstützt Now Playing
+- Teal.fm- und Rocksky-Quellen benötigen kein App-Passwort mehr
+- ListenBrainz- und Koito-Clients können bereinigte Geräteinformationen senden
+- MusicBrainz kann Hörbücher und Musikvideos ausschließen
+- Kleineres Docker-Image
 
 **Fehlerbehebungen**
 
-- Plex-Cover werden wieder angezeigt
-- Doppelte Plays lassen sich in der Play-Liste einer Quelle filtern
+- Eine Race Condition beim Start der Transformer und störende Startprotokolle wurden behoben
 
-Der erste Start nach dem Update berechnet für jeden gespeicherten Play eine Kennung neu und dauert bei einem großen Verlauf daher länger.
+**Vor dem Update**
 
-[Vollständige Upstream-Versionshinweise](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.18.1.
+- Rocksky: Die Authentifizierung per API-Schlüssel wurde entfernt, Zugriffstoken sind veraltet. Wechsle zu Handle und App-Passwort.
+- Discord: Das automatische Cover-Art-Archive-Artwork ist veraltet. Füge stattdessen die Transformation \`coverartarchive\` zu deinem Discord-Client hinzu.
+- Transformationen: Wenn du den Namen \`MSDefault\` verwendest und zusätzlich Transformationen über Umgebungsvariablen konfigurierst, benenne ihn in \`MSEnv\` um.
+
+[Vollständige Upstream-Versionshinweise](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
+    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.19.2.
 
 **Nowości**
 
-- Nowy interfejs webowy, zastępujący dotychczasowy panel
-- Pole \`contact\` transformatora MusicBrainz jest teraz opcjonalne
-- Limity żądań MusicBrainz można ustawić dla każdego serwera, a żądania są rozdzielane między twoje serwery
+- Transformator MusicBrainz jest teraz wbudowany i działa bez konfiguracji
+- Nowe transformatory Rocksky, Spotify i Cover Art Archive
+- Klient Rocksky zapisuje scrobble bezpośrednio w twoim PDS i obsługuje Now Playing
+- Źródła Teal.fm i Rocksky nie wymagają już hasła aplikacji
+- Klienci ListenBrainz i Koito mogą wysyłać oczyszczone informacje o urządzeniu
+- MusicBrainz może wykluczać audiobooki i teledyski
+- Mniejszy obraz Dockera
 
 **Poprawki**
 
-- Okładki z Plex znów się wyświetlają
-- Zduplikowane odtworzenia można filtrować na liście odtworzeń źródła
+- Naprawiono wyścig przy uruchamianiu transformatorów oraz zbędne logi startowe
 
-Pierwsze uruchomienie po aktualizacji przelicza identyfikator każdego zapisanego odtworzenia, więc przy dużej historii trwa dłużej.
+**Przed aktualizacją**
 
-[Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    fr_FR: `Multi-Scrobbler mis à jour vers 0.18.1.
+- Rocksky: uwierzytelnianie kluczem API zostało usunięte, a tokeny dostępu są przestarzałe. Przejdź na login i hasło aplikacji.
+- Discord: automatyczna okładka z Cover Art Archive jest przestarzała. Zamiast tego dodaj transformację \`coverartarchive\` do klienta Discord.
+- Transformacje: jeśli używasz nazwy \`MSDefault\` i konfigurujesz też transformacje zmiennymi środowiskowymi, zmień ją na \`MSEnv\`.
+
+[Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
+    fr_FR: `Multi-Scrobbler mis à jour vers 0.19.2.
 
 **Nouveautés**
 
-- Nouvelle interface web, qui remplace l’ancien tableau de bord
-- Le champ \`contact\` du transformateur MusicBrainz est désormais facultatif
-- Les limites de débit MusicBrainz peuvent être définies par serveur, et les requêtes sont réparties entre vos serveurs
+- Le transformateur MusicBrainz est désormais intégré et fonctionne sans configuration
+- Nouveaux transformateurs Rocksky, Spotify et Cover Art Archive
+- Le client Rocksky écrit les scrobbles directement dans votre PDS et prend en charge Now Playing
+- Les sources Teal.fm et Rocksky n’ont plus besoin de mot de passe d’application
+- Les clients ListenBrainz et Koito peuvent envoyer des informations d’appareil épurées
+- MusicBrainz peut exclure les livres audio et les clips vidéo
+- Image Docker plus légère
 
 **Corrections**
 
-- Les pochettes Plex s’affichent de nouveau
-- Les lectures en double peuvent être filtrées dans la liste des lectures d’une source
+- Correction d’une condition de concurrence au démarrage des transformateurs et des journaux de démarrage bruyants
 
-Le premier démarrage après la mise à jour recalcule un identifiant pour chaque lecture enregistrée ; il est donc plus long avec un historique volumineux.
+**Avant de mettre à jour**
 
-[Notes de version amont complètes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
+- Rocksky : l’authentification par clé d’API est supprimée et les jetons d’accès sont obsolètes. Passez à l’identifiant et au mot de passe d’application.
+- Discord : la pochette automatique de Cover Art Archive est obsolète. Ajoutez plutôt la transformation \`coverartarchive\` à votre client Discord.
+- Transformations : si vous utilisez le nom \`MSDefault\` et configurez aussi des transformations par variables d’environnement, renommez-le en \`MSEnv\`.
+
+[Notes de version amont complètes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
