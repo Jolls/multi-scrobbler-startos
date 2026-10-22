@@ -1,123 +1,103 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.19.2:0',
+  version: '0.20.1:0',
   releaseNotes: {
-    en_US: `Updated Multi-Scrobbler to 0.19.2.
+    en_US: `Updated Multi-Scrobbler to 0.20.1.
 
 **Features**
 
-- The MusicBrainz transformer is now built in and works without any setup
-- New Rocksky, Spotify and Cover Art Archive transformers
-- The Rocksky client writes scrobbles directly to your PDS and supports Now Playing
-- Teal.fm and Rocksky sources no longer need an app password
-- ListenBrainz and Koito clients can submit scrubbed device info
-- MusicBrainz can exclude audiobooks and music videos
-- Smaller Docker image
+- Plays can now be edited by hand, with a search mode that fills in fields from MusicBrainz, Spotify and Rocksky
+- New Tuneshine client for showing Now Playing on a Tuneshine display
+- New Mixcloud source that scrobbles the mixes you listen to
+- Spotify periodically backfills songs missed by live playback
+- Koito can submit play position, and the Deezer and ListenBrainz parsing is more complete
 
-**Fixes**
+**Security**
 
-- Fixed a transformer startup race condition and noisy startup logging
+- Node.js security fixes, including a remote code execution fix. Update promptly if Multi-Scrobbler is reachable from the internet
 
 **Before you update**
 
-- Rocksky: API key authentication is removed and access tokens are deprecated. Switch to handle and app password.
-- Discord: automatic Cover Art Archive artwork is deprecated. Add the \`coverartarchive\` transform to your Discord client instead.
-- Transforms: if you use the \`MSDefault\` name and also configure transforms through environment variables, rename it to \`MSEnv\`.
+- This update migrates the database automatically on first start. You cannot go back to an older version afterward
 
-[Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
-    es_ES: `Multi-Scrobbler actualizado a 0.19.2.
+[Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    es_ES: `Multi-Scrobbler actualizado a 0.20.1.
 
 **Novedades**
 
-- El transformador de MusicBrainz ahora está integrado y funciona sin configuración
-- Nuevos transformadores de Rocksky, Spotify y Cover Art Archive
-- El cliente de Rocksky escribe los scrobbles directamente en tu PDS y admite Now Playing
-- Las fuentes Teal.fm y Rocksky ya no necesitan contraseña de aplicación
-- Los clientes ListenBrainz y Koito pueden enviar información de dispositivo depurada
-- MusicBrainz puede excluir audiolibros y videos musicales
-- Imagen de Docker más pequeña
+- Ahora puedes editar reproducciones a mano, con un modo de búsqueda que rellena campos desde MusicBrainz, Spotify y Rocksky
+- Nuevo cliente Tuneshine para mostrar Now Playing en una pantalla Tuneshine
+- Nueva fuente Mixcloud que registra los mixes que escuchas
+- Spotify recupera periódicamente las canciones omitidas por la reproducción en vivo
+- Koito puede enviar la posición de reproducción, y el análisis de Deezer y ListenBrainz es más completo
 
-**Correcciones**
+**Seguridad**
 
-- Se corrigió una condición de carrera al iniciar los transformadores y el registro ruidoso al arrancar
+- Correcciones de seguridad de Node.js, incluida una de ejecución remota de código. Actualiza cuanto antes si Multi-Scrobbler es accesible desde internet
 
 **Antes de actualizar**
 
-- Rocksky: se elimina la autenticación con clave de API y los tokens de acceso quedan obsoletos. Cambia a usuario y contraseña de aplicación.
-- Discord: la carátula automática de Cover Art Archive queda obsoleta. Añade en su lugar la transformación \`coverartarchive\` a tu cliente de Discord.
-- Transformaciones: si usas el nombre \`MSDefault\` y también configuras transformaciones mediante variables de entorno, cámbialo a \`MSEnv\`.
+- Esta actualización migra la base de datos automáticamente en el primer inicio. Después no se puede volver a una versión anterior
 
-[Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
-    de_DE: `Multi-Scrobbler auf 0.19.2 aktualisiert.
+[Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    de_DE: `Multi-Scrobbler auf 0.20.1 aktualisiert.
 
 **Neuerungen**
 
-- Der MusicBrainz-Transformer ist jetzt integriert und funktioniert ohne Einrichtung
-- Neue Transformer für Rocksky, Spotify und Cover Art Archive
-- Der Rocksky-Client schreibt Scrobbles direkt in dein PDS und unterstützt Now Playing
-- Teal.fm- und Rocksky-Quellen benötigen kein App-Passwort mehr
-- ListenBrainz- und Koito-Clients können bereinigte Geräteinformationen senden
-- MusicBrainz kann Hörbücher und Musikvideos ausschließen
-- Kleineres Docker-Image
+- Wiedergaben lassen sich jetzt von Hand bearbeiten, mit einem Suchmodus, der Felder aus MusicBrainz, Spotify und Rocksky befüllt
+- Neuer Tuneshine-Client, um Now Playing auf einem Tuneshine-Display anzuzeigen
+- Neue Mixcloud-Quelle, die die gehörten Mixes scrobbelt
+- Spotify holt regelmäßig Titel nach, die bei der Live-Wiedergabe verpasst wurden
+- Koito kann die Wiedergabeposition senden, und die Auswertung von Deezer und ListenBrainz ist vollständiger
 
-**Fehlerbehebungen**
+**Sicherheit**
 
-- Eine Race Condition beim Start der Transformer und störende Startprotokolle wurden behoben
+- Node.js-Sicherheitsfixes, darunter ein Fix für Remote-Code-Ausführung. Bitte zeitnah aktualisieren, wenn Multi-Scrobbler aus dem Internet erreichbar ist
 
 **Vor dem Update**
 
-- Rocksky: Die Authentifizierung per API-Schlüssel wurde entfernt, Zugriffstoken sind veraltet. Wechsle zu Handle und App-Passwort.
-- Discord: Das automatische Cover-Art-Archive-Artwork ist veraltet. Füge stattdessen die Transformation \`coverartarchive\` zu deinem Discord-Client hinzu.
-- Transformationen: Wenn du den Namen \`MSDefault\` verwendest und zusätzlich Transformationen über Umgebungsvariablen konfigurierst, benenne ihn in \`MSEnv\` um.
+- Dieses Update migriert die Datenbank beim ersten Start automatisch. Danach ist keine Rückkehr zu einer älteren Version möglich
 
-[Vollständige Upstream-Versionshinweise](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
-    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.19.2.
+[Vollständige Release Notes des Originalprojekts](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.20.1.
 
 **Nowości**
 
-- Transformator MusicBrainz jest teraz wbudowany i działa bez konfiguracji
-- Nowe transformatory Rocksky, Spotify i Cover Art Archive
-- Klient Rocksky zapisuje scrobble bezpośrednio w twoim PDS i obsługuje Now Playing
-- Źródła Teal.fm i Rocksky nie wymagają już hasła aplikacji
-- Klienci ListenBrainz i Koito mogą wysyłać oczyszczone informacje o urządzeniu
-- MusicBrainz może wykluczać audiobooki i teledyski
-- Mniejszy obraz Dockera
+- Odtworzenia można teraz edytować ręcznie, z trybem wyszukiwania uzupełniającym pola z MusicBrainz, Spotify i Rocksky
+- Nowy klient Tuneshine do wyświetlania Now Playing na wyświetlaczu Tuneshine
+- Nowe źródło Mixcloud, które scrobbluje słuchane miksy
+- Spotify okresowo uzupełnia utwory pominięte przy odtwarzaniu na żywo
+- Koito może wysyłać pozycję odtwarzania, a parsowanie danych Deezer i ListenBrainz jest pełniejsze
 
-**Poprawki**
+**Bezpieczeństwo**
 
-- Naprawiono wyścig przy uruchamianiu transformatorów oraz zbędne logi startowe
+- Poprawki bezpieczeństwa Node.js, w tym poprawka zdalnego wykonania kodu. Zaktualizuj szybko, jeśli Multi-Scrobbler jest dostępny z internetu
 
 **Przed aktualizacją**
 
-- Rocksky: uwierzytelnianie kluczem API zostało usunięte, a tokeny dostępu są przestarzałe. Przejdź na login i hasło aplikacji.
-- Discord: automatyczna okładka z Cover Art Archive jest przestarzała. Zamiast tego dodaj transformację \`coverartarchive\` do klienta Discord.
-- Transformacje: jeśli używasz nazwy \`MSDefault\` i konfigurujesz też transformacje zmiennymi środowiskowymi, zmień ją na \`MSEnv\`.
+- Ta aktualizacja automatycznie migruje bazę danych przy pierwszym uruchomieniu. Potem nie można wrócić do starszej wersji
 
-[Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
-    fr_FR: `Multi-Scrobbler mis à jour vers 0.19.2.
+[Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    fr_FR: `Multi-Scrobbler mis à jour vers 0.20.1.
 
 **Nouveautés**
 
-- Le transformateur MusicBrainz est désormais intégré et fonctionne sans configuration
-- Nouveaux transformateurs Rocksky, Spotify et Cover Art Archive
-- Le client Rocksky écrit les scrobbles directement dans votre PDS et prend en charge Now Playing
-- Les sources Teal.fm et Rocksky n’ont plus besoin de mot de passe d’application
-- Les clients ListenBrainz et Koito peuvent envoyer des informations d’appareil épurées
-- MusicBrainz peut exclure les livres audio et les clips vidéo
-- Image Docker plus légère
+- Les lectures peuvent désormais être modifiées à la main, avec un mode recherche qui remplit les champs depuis MusicBrainz, Spotify et Rocksky
+- Nouveau client Tuneshine pour afficher Now Playing sur un écran Tuneshine
+- Nouvelle source Mixcloud qui enregistre les mixes que vous écoutez
+- Spotify récupère périodiquement les titres manqués par la lecture en direct
+- Koito peut envoyer la position de lecture, et l’analyse de Deezer et ListenBrainz est plus complète
 
-**Corrections**
+**Sécurité**
 
-- Correction d’une condition de concurrence au démarrage des transformateurs et des journaux de démarrage bruyants
+- Correctifs de sécurité de Node.js, dont un correctif d’exécution de code à distance. Mettez à jour rapidement si Multi-Scrobbler est accessible depuis internet
 
 **Avant de mettre à jour**
 
-- Rocksky : l’authentification par clé d’API est supprimée et les jetons d’accès sont obsolètes. Passez à l’identifiant et au mot de passe d’application.
-- Discord : la pochette automatique de Cover Art Archive est obsolète. Ajoutez plutôt la transformation \`coverartarchive\` à votre client Discord.
-- Transformations : si vous utilisez le nom \`MSDefault\` et configurez aussi des transformations par variables d’environnement, renommez-le en \`MSEnv\`.
+- Cette mise à jour migre automatiquement la base de données au premier démarrage. Il est impossible de revenir à une version antérieure ensuite
 
-[Notes de version amont complètes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.19.0)`,
+[Notes de version amont complètes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
