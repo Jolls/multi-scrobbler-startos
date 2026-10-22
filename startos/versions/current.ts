@@ -1,88 +1,103 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.18.1:0',
+  version: '0.20.1:0',
   releaseNotes: {
-    en_US: `Updated Multi-Scrobbler to 0.18.1.
+    en_US: `Updated Multi-Scrobbler to 0.20.1.
 
 **Features**
 
-- New web interface, replacing the previous dashboard
-- The MusicBrainz transformer's \`contact\` field is now optional
-- MusicBrainz rate limits can be set per server, and requests are spread across your servers
+- Plays can now be edited by hand, with a search mode that fills in fields from MusicBrainz, Spotify and Rocksky
+- New Tuneshine client for showing Now Playing on a Tuneshine display
+- New Mixcloud source that scrobbles the mixes you listen to
+- Spotify periodically backfills songs missed by live playback
+- Koito can submit play position, and the Deezer and ListenBrainz parsing is more complete
 
-**Fixes**
+**Security**
 
-- Plex artwork displays again
-- Duplicate plays can be filtered in a source's play list
+- Node.js security fixes, including a remote code execution fix. Update promptly if Multi-Scrobbler is reachable from the internet
 
-The first start after updating recalculates an identifier for every stored play, so it takes longer with a large play history.
+**Before you update**
 
-[Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    es_ES: `Multi-Scrobbler actualizado a 0.18.1.
+- This update migrates the database automatically on first start. You cannot go back to an older version afterward
+
+[Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    es_ES: `Multi-Scrobbler actualizado a 0.20.1.
 
 **Novedades**
 
-- Nueva interfaz web, que sustituye al panel anterior
-- El campo \`contact\` del transformador de MusicBrainz ahora es opcional
-- Los límites de tasa de MusicBrainz se pueden fijar por servidor, y las solicitudes se reparten entre tus servidores
+- Ahora puedes editar reproducciones a mano, con un modo de búsqueda que rellena campos desde MusicBrainz, Spotify y Rocksky
+- Nuevo cliente Tuneshine para mostrar Now Playing en una pantalla Tuneshine
+- Nueva fuente Mixcloud que registra los mixes que escuchas
+- Spotify recupera periódicamente las canciones omitidas por la reproducción en vivo
+- Koito puede enviar la posición de reproducción, y el análisis de Deezer y ListenBrainz es más completo
 
-**Correcciones**
+**Seguridad**
 
-- Las carátulas de Plex vuelven a mostrarse
-- Las reproducciones duplicadas se pueden filtrar en la lista de reproducciones de una fuente
+- Correcciones de seguridad de Node.js, incluida una de ejecución remota de código. Actualiza cuanto antes si Multi-Scrobbler es accesible desde internet
 
-El primer inicio tras la actualización recalcula un identificador para cada reproducción guardada, por lo que tarda más con un historial grande.
+**Antes de actualizar**
 
-[Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    de_DE: `Multi-Scrobbler auf 0.18.1 aktualisiert.
+- Esta actualización migra la base de datos automáticamente en el primer inicio. Después no se puede volver a una versión anterior
+
+[Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    de_DE: `Multi-Scrobbler auf 0.20.1 aktualisiert.
 
 **Neuerungen**
 
-- Neue Weboberfläche, die das bisherige Dashboard ersetzt
-- Das Feld \`contact\` des MusicBrainz-Transformers ist jetzt optional
-- MusicBrainz-Ratenlimits lassen sich pro Server festlegen, und Anfragen werden auf deine Server verteilt
+- Wiedergaben lassen sich jetzt von Hand bearbeiten, mit einem Suchmodus, der Felder aus MusicBrainz, Spotify und Rocksky befüllt
+- Neuer Tuneshine-Client, um Now Playing auf einem Tuneshine-Display anzuzeigen
+- Neue Mixcloud-Quelle, die die gehörten Mixes scrobbelt
+- Spotify holt regelmäßig Titel nach, die bei der Live-Wiedergabe verpasst wurden
+- Koito kann die Wiedergabeposition senden, und die Auswertung von Deezer und ListenBrainz ist vollständiger
 
-**Fehlerbehebungen**
+**Sicherheit**
 
-- Plex-Cover werden wieder angezeigt
-- Doppelte Plays lassen sich in der Play-Liste einer Quelle filtern
+- Node.js-Sicherheitsfixes, darunter ein Fix für Remote-Code-Ausführung. Bitte zeitnah aktualisieren, wenn Multi-Scrobbler aus dem Internet erreichbar ist
 
-Der erste Start nach dem Update berechnet für jeden gespeicherten Play eine Kennung neu und dauert bei einem großen Verlauf daher länger.
+**Vor dem Update**
 
-[Vollständige Upstream-Versionshinweise](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.18.1.
+- Dieses Update migriert die Datenbank beim ersten Start automatisch. Danach ist keine Rückkehr zu einer älteren Version möglich
+
+[Vollständige Release Notes des Originalprojekts](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.20.1.
 
 **Nowości**
 
-- Nowy interfejs webowy, zastępujący dotychczasowy panel
-- Pole \`contact\` transformatora MusicBrainz jest teraz opcjonalne
-- Limity żądań MusicBrainz można ustawić dla każdego serwera, a żądania są rozdzielane między twoje serwery
+- Odtworzenia można teraz edytować ręcznie, z trybem wyszukiwania uzupełniającym pola z MusicBrainz, Spotify i Rocksky
+- Nowy klient Tuneshine do wyświetlania Now Playing na wyświetlaczu Tuneshine
+- Nowe źródło Mixcloud, które scrobbluje słuchane miksy
+- Spotify okresowo uzupełnia utwory pominięte przy odtwarzaniu na żywo
+- Koito może wysyłać pozycję odtwarzania, a parsowanie danych Deezer i ListenBrainz jest pełniejsze
 
-**Poprawki**
+**Bezpieczeństwo**
 
-- Okładki z Plex znów się wyświetlają
-- Zduplikowane odtworzenia można filtrować na liście odtworzeń źródła
+- Poprawki bezpieczeństwa Node.js, w tym poprawka zdalnego wykonania kodu. Zaktualizuj szybko, jeśli Multi-Scrobbler jest dostępny z internetu
 
-Pierwsze uruchomienie po aktualizacji przelicza identyfikator każdego zapisanego odtworzenia, więc przy dużej historii trwa dłużej.
+**Przed aktualizacją**
 
-[Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
-    fr_FR: `Multi-Scrobbler mis à jour vers 0.18.1.
+- Ta aktualizacja automatycznie migruje bazę danych przy pierwszym uruchomieniu. Potem nie można wrócić do starszej wersji
+
+[Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
+    fr_FR: `Multi-Scrobbler mis à jour vers 0.20.1.
 
 **Nouveautés**
 
-- Nouvelle interface web, qui remplace l’ancien tableau de bord
-- Le champ \`contact\` du transformateur MusicBrainz est désormais facultatif
-- Les limites de débit MusicBrainz peuvent être définies par serveur, et les requêtes sont réparties entre vos serveurs
+- Les lectures peuvent désormais être modifiées à la main, avec un mode recherche qui remplit les champs depuis MusicBrainz, Spotify et Rocksky
+- Nouveau client Tuneshine pour afficher Now Playing sur un écran Tuneshine
+- Nouvelle source Mixcloud qui enregistre les mixes que vous écoutez
+- Spotify récupère périodiquement les titres manqués par la lecture en direct
+- Koito peut envoyer la position de lecture, et l’analyse de Deezer et ListenBrainz est plus complète
 
-**Corrections**
+**Sécurité**
 
-- Les pochettes Plex s’affichent de nouveau
-- Les lectures en double peuvent être filtrées dans la liste des lectures d’une source
+- Correctifs de sécurité de Node.js, dont un correctif d’exécution de code à distance. Mettez à jour rapidement si Multi-Scrobbler est accessible depuis internet
 
-Le premier démarrage après la mise à jour recalcule un identifiant pour chaque lecture enregistrée ; il est donc plus long avec un historique volumineux.
+**Avant de mettre à jour**
 
-[Notes de version amont complètes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.18.0)`,
+- Cette mise à jour migre automatiquement la base de données au premier démarrage. Il est impossible de revenir à une version antérieure ensuite
+
+[Notes de version amont complètes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
   },
   migrations: {
     up: async ({ effects }) => {},
