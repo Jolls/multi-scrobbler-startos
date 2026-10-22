@@ -1,9 +1,9 @@
 import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const current = VersionInfo.of({
-  version: '0.20.1:0',
+  version: '0.20.2:0',
   releaseNotes: {
-    en_US: `Updated Multi-Scrobbler to 0.20.1.
+    en_US: `Updated Multi-Scrobbler to 0.20.2.
 
 **Features**
 
@@ -23,7 +23,7 @@ export const current = VersionInfo.of({
 - This update migrates the database automatically on first start. You cannot go back to an older version afterward
 
 [Full upstream release notes](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
-    es_ES: `Multi-Scrobbler actualizado a 0.20.1.
+    es_ES: `Multi-Scrobbler actualizado a 0.20.2.
 
 **Novedades**
 
@@ -43,7 +43,7 @@ export const current = VersionInfo.of({
 - Esta actualización migra la base de datos automáticamente en el primer inicio. Después no se puede volver a una versión anterior
 
 [Notas completas de la versión de origen](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
-    de_DE: `Multi-Scrobbler auf 0.20.1 aktualisiert.
+    de_DE: `Multi-Scrobbler auf 0.20.2 aktualisiert.
 
 **Neuerungen**
 
@@ -63,7 +63,7 @@ export const current = VersionInfo.of({
 - Dieses Update migriert die Datenbank beim ersten Start automatisch. Danach ist keine Rückkehr zu einer älteren Version möglich
 
 [Vollständige Release Notes des Originalprojekts](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
-    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.20.1.
+    pl_PL: `Zaktualizowano Multi-Scrobbler do 0.20.2.
 
 **Nowości**
 
@@ -83,7 +83,7 @@ export const current = VersionInfo.of({
 - Ta aktualizacja automatycznie migruje bazę danych przy pierwszym uruchomieniu. Potem nie można wrócić do starszej wersji
 
 [Pełne informacje o wydaniu źródłowym](https://github.com/FoxxMD/multi-scrobbler/releases/tag/0.20.0)`,
-    fr_FR: `Multi-Scrobbler mis à jour vers 0.20.1.
+    fr_FR: `Multi-Scrobbler mis à jour vers 0.20.2.
 
 **Nouveautés**
 
