@@ -34,7 +34,7 @@ clients such as Last.fm, ListenBrainz, and Maloja.
 
 ## Image and Container Runtime
 
-The upstream `foxxmd/multi-scrobbler` image is used unmodified, for `x86_64` and `aarch64`.
+The upstream `foxxmd/multi-scrobbler` image is built through the root `Dockerfile`, for `x86_64` and `aarch64`: a temporary layer that upgrades its `ca-certificates` and sets `NODE_OPTIONS=--use-openssl-ca`, which comes out once upstream ships an image built on a fixed store.
 
 It is built on linuxserver.io's `baseimage-debian`, whose s6-overlay `/init` entrypoint must
 run as PID 1, so the daemon execs the image's own entrypoint rather than node directly. The

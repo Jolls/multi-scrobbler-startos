@@ -54,6 +54,7 @@ export const malojaConnectionInfo = sdk.Action.withoutInput(
         masked: false,
         copyable: true,
         qr: false,
+        launchable: false,
       },
     }
   },
