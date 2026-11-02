@@ -14,7 +14,7 @@ export const setWebUiPassword = sdk.Action.withoutInput(
   async ({ effects }) => ({
     name: i18n('Set Web UI Password'),
     description: i18n(
-      'Gate the web interface behind a username and password, enforced by the StartOS reverse proxy. Only affects your browser and off-box callers — other packages on this server (e.g. Navidrome’s scrobble feed) reach this service over the internal network directly, unaffected either way.',
+      'Gate the web interface behind a username and password, enforced by the StartOS reverse proxy. It also blocks other services on this server, including Navidrome’s scrobble feed, which can’t send the login; clear the password to use them.',
     ),
     warning: (await storeJson.read((s) => s.uiPassword).const(effects))
       ? i18n(
