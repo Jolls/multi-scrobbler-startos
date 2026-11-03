@@ -29,7 +29,7 @@ const dict = {
   'Choose the address Spotify, Last.fm, and other authorization flows send your browser back to.': 19,
   // actions/setWebUiPassword.ts
   'Set Web UI Password': 20,
-  'Gate the web interface behind a username and password, enforced by the StartOS reverse proxy. Only affects your browser and off-box callers — other packages on this server (e.g. Navidrome’s scrobble feed) reach this service over the internal network directly, unaffected either way.': 21,
+  'Gate the web interface behind a username and password, enforced by the StartOS reverse proxy. It also blocks other services on this server, including Navidrome’s scrobble feed, which can’t send the login; clear the password to use them.': 21,
   'This locks the whole web interface port, including the endpoints push-based sources send scrobbles to without a browser: the WebScrobbler browser extension, ListenBrainz-compatible clients, Last.fm-compatible clients, and Plex/Tautulli/Jellyfin webhooks. Any of those already configured will stop working until you point them at credentials that support basic auth, or run Clear Web UI Password. Pull-based sources (Spotify, Subsonic, Last.fm, YouTube Music) are unaffected.': 22,
   'Web UI Login': 23,
   'Use these credentials to sign in to the web interface. Run Clear Web UI Password to turn the gate back off.': 24,

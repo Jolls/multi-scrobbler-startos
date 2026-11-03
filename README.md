@@ -141,21 +141,13 @@ Plex/Tautulli/Jellyfin webhooks — since none of them authenticate with HTTP ba
 sources (Spotify, Subsonic, Last.fm, YouTube Music) are unaffected; multi-scrobbler dials out to
 those rather than being called into. **Clear Web UI Password** turns the gate back off.
 
-**The gate is narrower than "the whole interface," though: it only covers the externally-facing
-address.** `addSsl.auth` is enforced by the OS reverse proxy on the TLS-terminated leg of this
-binding — the one a browser, or an off-box service like WebScrobbler, actually reaches. It has
-no effect on the plaintext internal service-to-service bridge (`10.0.3.1:<port>`, resolved via
-`sdk.host.getBridgeAddress`) that other StartOS packages on the same server use to reach this
-one directly. Confirmed by attaching into another package's container and curling both legs
-while the gate was on: the bridge address returned `200` with no credentials, the proxied
-address `401`. **navidrome-startos**'s scrobble-to-multi-scrobbler feature (`ND_LISTENBRAINZ_BASEURL`
-in its `main.ts`) resolves this service over that bridge, so it keeps working unchanged whether
-or not the password is set — and this holds for *any* installed package, not just declared
-dependents: `dependencies.ts` governs start order, version checks, and health-check gating, not
-bridge reachability, so a package with no dependency relationship on this one at all can reach
-its unauthenticated API over the bridge exactly the same way. The password protects this
-interface from the browser and from off-box callers; it is not a boundary between packages on
-the same server.
+**The gate covers every address of this binding, including the plaintext bridge address
+(`10.0.3.1:<port>`) that other StartOS packages resolve with `sdk.host.getBridgeAddress`.** While
+a password is set, those packages get `401` too. **navidrome-startos**'s scrobble-to-multi-scrobbler
+feature (`ND_LISTENBRAINZ_BASEURL` in its `main.ts`) dials that address with Navidrome's
+ListenBrainz client, which always sends its own `Authorization: Token <token>` header and so can
+never answer the basic-auth challenge: scrobbling from Navidrome works only while no password is
+set.
 
 ## Installation and First-Run Flow
 
@@ -209,8 +201,8 @@ toggle the web UI password gate.
   reactively via `.const(effects)` and passes it as StartOS reverse-proxy basic auth
   (`addSsl.auth`) on the web interface binding, so the gate takes effect without a restart.
   Re-running it rotates the password. Its warning names the push-based source types that stop
-  working while it's on, and its description notes that other StartOS packages reaching this
-  service over the bridge are unaffected either way — see
+  working while it's on, and its description notes that it blocks other StartOS packages
+  reaching this service over the bridge as well, Navidrome's scrobble feed included — see
   [Network Access and Interfaces](#network-access-and-interfaces).
 
 - **Clear Web UI Password** (`clear-web-ui-password`) — merges `uiPassword` back to `undefined`
