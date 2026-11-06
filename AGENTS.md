@@ -34,9 +34,6 @@ verified, tried, and decided belongs in the commit message and the PR body.
 
 ## This repo
 
-- **`assets/svc-node-down-signal` mounts onto a path the upstream image does not ship.**
-  s6-rc reads `down-signal` out of its source tree at boot, so the mountpoint is created by
-  the mount; don't retarget it at a file that already exists.
 - **The `maloja-startos` npm dependency exists only for `uiHostId`/`uiPort`.** They are
   scalars, so nothing of Maloja's code reaches the built bundle — don't import a value object
   from it without checking what that pulls in.
