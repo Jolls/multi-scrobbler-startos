@@ -15,20 +15,12 @@ export const main = sdk.setupMain(async ({ effects }) => {
     subcontainer: sdk.SubContainer.of(
       effects,
       { imageId: 'multi-scrobbler' },
-      sdk.Mounts.of()
-        .mountVolume({
-          volumeId: 'config',
-          subpath: null,
-          mountpoint: '/config',
-          readonly: false,
-        })
-        // multi-scrobbler's node process only flushes its DB connection on
-        // SIGINT, and s6's default stop signal is SIGTERM.
-        .mountAssets({
-          subpath: 'svc-node-down-signal',
-          mountpoint: '/etc/s6-overlay/s6-rc.d/svc-node/down-signal',
-          type: 'file',
-        }),
+      sdk.Mounts.of().mountVolume({
+        volumeId: 'config',
+        subpath: null,
+        mountpoint: '/config',
+        readonly: false,
+      }),
       'multi-scrobbler-sub',
     ),
     exec: {
