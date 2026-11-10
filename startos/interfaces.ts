@@ -11,7 +11,7 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
   const origin = await multi.bindPort(uiPort, {
     protocol: 'http',
     preferredExternalPort: 9078,
-    addSsl: {
+    proxy: {
       auth: uiPassword
         ? {
             type: 'basic',
