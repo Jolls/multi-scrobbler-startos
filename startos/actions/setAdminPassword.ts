@@ -2,7 +2,6 @@ import { utils } from '@start9labs/start-sdk'
 import { storeJson } from '../fileModels/store.json'
 import { i18n } from '../i18n'
 import { sdk } from '../sdk'
-import { adminUsername } from '../utils'
 
 export const setAdminPassword = sdk.Action.withoutInput(
   'set-admin-password',
@@ -28,25 +27,16 @@ export const setAdminPassword = sdk.Action.withoutInput(
       len: 24,
     })
     await storeJson.merge(effects, { adminPassword: password })
+    // Upstream password resets preserve the account's current username.
     return {
       version: '1' as const,
-      title: i18n('Admin Login'),
+      title: i18n('Admin Password'),
       message: i18n(
-        'Use these credentials to sign in to the dashboard. Scrobble endpoints such as ListenBrainz, Last.fm and WebScrobbler do not use them.',
+        'Sign in with this password and your current username (admin unless changed in the dashboard). The password-reset message in the service logs shows the current username. Scrobble endpoints such as ListenBrainz, Last.fm and WebScrobbler do not use this login.',
       ),
       result: {
         type: 'group' as const,
         value: [
-          {
-            type: 'single' as const,
-            name: i18n('Username'),
-            description: null,
-            value: adminUsername,
-            masked: false,
-            copyable: true,
-            qr: false,
-            launchable: false,
-          },
           {
             type: 'single' as const,
             name: i18n('Password'),

@@ -123,11 +123,11 @@ return.
 | Web Interface | `ui` | ui   | 9078 | HTTP     | dashboard, OAuth authorization links, and the REST API |
 
 **Access control is multi-scrobbler's own login** (built-in authentication, new in upstream
-0.21.0). It has a single account, `admin`. Until that account has a password, upstream runs
-"unsecured": every request is treated as the admin, though requests through a host it does
-not recognize are read-only. Hosts it recognizes include IP addresses, `.local` names and the
-`BASE_URL` host. Once a password is set, the dashboard and the whole REST API (logs,
-starting and stopping sources, the dead-scrobble queue, OAuth flows, `/api/metrics`) require
+0.21.0). It has a single account, initially named `admin`. Until that account has a password,
+upstream runs "unsecured": every request is treated as the admin, though requests through a
+host it does not recognize are read-only. Hosts it recognizes include IP addresses, `.local`
+names and the `BASE_URL` host. Once a password is set, the dashboard and the whole REST API
+(logs, starting and stopping sources, the dead-scrobble queue, OAuth flows, `/api/metrics`) require
 a login session or an API key created under Settings → Account.
 
 The package sets the password through upstream's environment variables, never by writing to
@@ -199,13 +199,14 @@ password.
   when Maloja is absent or stopped.
 
 - **Set Admin Password** (`set-admin-password`) — generates a random 24-character password,
-  writes it to `store.json` as `adminPassword`, and returns the username (`admin`) and password
-  as a credential pair you can view once. The daemon restarts and applies the password through
-  `ADMIN_RESET_PW`, signing the admin out in every browser. Once a password is stored, the
-  action warns before replacing it. Run it again to rotate the password or to recover a
-  forgotten one, including one changed in the dashboard. The username shown is always `admin`.
-  If it was renamed in the dashboard, the new name is logged at startup, partly redacted
-  (`Dashboard and API are secured. Admin username: …`).
+  writes it to `store.json` as `adminPassword`, and returns the password for one-time viewing.
+  The daemon restarts and applies the password through `ADMIN_RESET_PW`, signing the admin
+  out in every browser. Once a password is stored, the action warns before replacing it.
+  Run it again to rotate the password or to recover a forgotten one, including one changed
+  in the dashboard. Password resets preserve the current username: it is `admin` unless
+  renamed in Settings → Account. After the reset, the service logs include the full username
+  in `Password for admin '<username>' was reset from ADMIN_RESET_PW…`; the ordinary startup
+  message redacts it.
 
 ## Tasks
 

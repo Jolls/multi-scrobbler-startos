@@ -31,9 +31,8 @@ const dict = {
   'Set Admin Password': 20,
   'Generate a new random password for the dashboard’s admin account. Replaces any existing password, including one changed in the dashboard.': 21,
   'Replaces the current admin password and signs the admin out in every browser. Multi-Scrobbler restarts to apply it.': 22,
-  'Admin Login': 23,
-  'Use these credentials to sign in to the dashboard. Scrobble endpoints such as ListenBrainz, Last.fm and WebScrobbler do not use them.': 24,
-  Username: 25,
+  'Admin Password': 23,
+  'Sign in with this password and your current username (admin unless changed in the dashboard). The password-reset message in the service logs shows the current username. Scrobble endpoints such as ListenBrainz, Last.fm and WebScrobbler do not use this login.': 24,
   Password: 26,
   // init/adminPasswordTask.ts
   'Set an admin password: until one is set, anyone who can reach the dashboard can control it.': 27,

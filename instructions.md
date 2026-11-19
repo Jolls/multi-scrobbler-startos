@@ -21,8 +21,7 @@ on this server) don't need the login, and keep working with it set.
 ## Getting set up
 
 1. Run **Set Admin Password** when StartOS asks you to. The service won't start until you do.
-   Keep the username (`admin`) and password it shows, and sign in to the **Web Interface**
-   with them.
+   Keep the password it shows, and sign in to the **Web Interface** with the username `admin`.
 2. A new install also asks you to run **Set Callback Address**. Pick the address you will be
    browsing from when you authorize a source through Spotify, Last.fm, Deezer, or YouTube
    Music. This is where those services send your browser back to once you approve access, so
@@ -64,11 +63,13 @@ authorization links for anything not yet approved, and the recent plays it has p
   change.
 - **Get Maloja Connection Info** — gives you the URL a Maloja client entry needs when Maloja
   is running on this same server.
-- **Set Admin Password** — creates a new random password for the `admin` login and shows it
+- **Set Admin Password** — creates a new random password for the admin account and shows it
   to you. The service restarts and you're signed out in every browser. Run it again any time
   to change the password, or if you've forgotten one you set in the dashboard. You can also
-  change the password or username under Settings → Account in the dashboard. That change lasts
-  until you next run this action, which always shows the username as `admin`.
+  change the password or username under Settings → Account in the dashboard. This action
+  replaces the password but leaves the username unchanged (`admin` unless you renamed it).
+  If you forget the username, run the action and find it in the password-reset message in
+  the service logs after the restart.
 
 ## Limitations
 
