@@ -14,16 +14,16 @@ Sources and clients are added through an action rather than by editing a file ov
 the address that music services send you back to after authorization is one you pick from a
 list.
 
-Multi-Scrobbler has no password of its own. By default, anyone who can open the address can do
-everything you can — read its logs, pause your scrobbling, and start an authorization flow.
-Your account credentials are not on show, but the controls are, so either enable only the
-addresses you would hand those controls to, or run **Set Web UI Password** (below) to require a
-login.
+The dashboard and its API are behind an admin login. The addresses music players and browser
+extensions send scrobbles to (ListenBrainz, Last.fm and WebScrobbler endpoints, and Navidrome
+on this server) don't need the login, and keep working with it set.
 
 ## Getting set up
 
-1. Start the service and open the **Web Interface** to confirm it is running.
-2. A new install asks you to run **Set Callback Address**. Pick the address you will be
+1. Run **Set Admin Password** when StartOS asks you to. The service won't start until you do.
+   Keep the username (`admin`) and password it shows, and sign in to the **Web Interface**
+   with them.
+2. A new install also asks you to run **Set Callback Address**. Pick the address you will be
    browsing from when you authorize a source through Spotify, Last.fm, Deezer, or YouTube
    Music. This is where those services send your browser back to once you approve access, so
    it has to be an address that browser can reach: a `.local` name works from a device on the
@@ -64,17 +64,11 @@ authorization links for anything not yet approved, and the recent plays it has p
   change.
 - **Get Maloja Connection Info** — gives you the URL a Maloja client entry needs when Maloja
   is running on this same server.
-- **Set Web UI Password** — turns on a login (username `admin`, generated password) for the
-  web interface, enforced before the request reaches Multi-Scrobbler. Read the warning before
-  running it: because the dashboard, the API, and scrobble ingest all share one port, this
-  also locks out push-based sources that can't send a username and password — the WebScrobbler
-  browser extension, ListenBrainz-compatible clients, Last.fm-compatible clients, and
-  Plex/Tautulli/Jellyfin webhooks. Sources Multi-Scrobbler connects out to instead (Spotify,
-  Subsonic, Last.fm, YouTube Music) keep working either way. Re-running it issues a new
-  password, and warns you first that the old one stops working. The login also blocks other
-  services on this server, including Navidrome's scrobble feed, which can't send it; clear the
-  password to use them.
-- **Clear Web UI Password** — turns the login back off, after asking you to confirm.
+- **Set Admin Password** — creates a new random password for the `admin` login and shows it
+  to you. The service restarts and you're signed out in every browser. Run it again any time
+  to change the password, or if you've forgotten one you set in the dashboard. You can also
+  change the password or username under Settings → Account in the dashboard. That change lasts
+  until you next run this action, which always shows the username as `admin`.
 
 ## Limitations
 

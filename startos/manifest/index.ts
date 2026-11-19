@@ -13,7 +13,7 @@ export const manifest = setupManifest({
   volumes: ['config', 'startos'],
   images: {
     'multi-scrobbler': {
-      source: { dockerTag: 'foxxmd/multi-scrobbler:0.20.3' },
+      source: { dockerTag: 'foxxmd/multi-scrobbler:0.21.1' },
       arch: ['x86_64', 'aarch64'],
     },
   },

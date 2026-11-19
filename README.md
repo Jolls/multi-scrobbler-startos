@@ -36,9 +36,17 @@ clients such as Last.fm, ListenBrainz, and Maloja.
 
 The upstream `foxxmd/multi-scrobbler` image is used unmodified, for `x86_64` and `aarch64`.
 
-It is built on linuxserver.io's `baseimage-debian`, whose s6-overlay `/init` entrypoint must
-run as PID 1, so the daemon execs the image's own entrypoint rather than node directly. The
-single subcontainer is named `multi-scrobbler-sub`.
+Since 0.21.0 it is a distroless image: no shell, no coreutils, only `/nodejs/bin/node`, which
+is the entrypoint. It runs as the non-root user `65532:65532` (the image's `USER`), and the
+daemon uses the image's own entrypoint and user. The single subcontainer is named
+`multi-scrobbler-sub`.
+
+A `chown` oneshot runs before the daemon on every start. With no `chown` binary in the image,
+it runs the image's `node` as root with a short inline script that recursively `lchown`s
+`/config` to `65532:65532`. That covers both a fresh volume, which mounts root-owned, and data
+written by package releases before 0.21.1:0, which ran upstream's old linuxserver base as
+`1000:1000`. If it fails, the daemon never starts and upstream would otherwise exit with
+`/config is not writable`.
 
 ## Volume and Data Layout
 
@@ -77,9 +85,12 @@ entries. The package never writes it; it reads it raw only to decide whether the
 dependency applies (see [Dependencies](#dependencies)).
 
 `store.json`, on the `startos` volume, holds two keys: `baseUrl`, the address chosen by
-**Set Callback Address**, and `uiPassword`, set (and cleared) by **Set Web UI Password** /
-**Clear Web UI Password**. Nothing seeds either: `baseUrl` is written only by the action, and
-`uiPassword` only by the password actions, read by `setInterfaces` alone.
+**Set Callback Address**, and `adminPassword`, written only by **Set Admin Password**. Nothing
+seeds either. `main` reads `adminPassword` reactively and passes it as `ADMIN_RESET_PW` (see
+[Network Access and Interfaces](#network-access-and-interfaces)), so running the action
+restarts the daemon. Package releases before 0.21.1:0 kept a `uiPassword` key for a StartOS
+basic-auth gate. The 0.21.1:0 migration moves it to `adminPassword`, unless that is already
+set, and removes it.
 
 The `BASE_URL` environment variable comes from `baseUrl`, followed to its hostname's current
 port and scheme. While `baseUrl` is unset or its hostname is no longer one of the interface's
@@ -111,49 +122,48 @@ return.
 | ------------- | ---- | ---- | ---- | -------- | ---------------------------------------------------- |
 | Web Interface | `ui` | ui   | 9078 | HTTP     | dashboard, OAuth authorization links, and the REST API |
 
-**Upstream ships no login layer of its own**, so without further action, whichever addresses
-are enabled for this interface are the entire access control. Its `auth` module handles only
-outbound OAuth to Spotify, Last.fm, Deezer and YouTube Music, and the session middleware exists
-to carry those callbacks rather than to identify a user.
+**Access control is multi-scrobbler's own login** (built-in authentication, new in upstream
+0.21.0). It has a single account, `admin`. Until that account has a password, upstream runs
+"unsecured": every request is treated as the admin, though requests through a host it does
+not recognize are read-only. Hosts it recognizes include IP addresses, `.local` names and the
+`BASE_URL` host. Once a password is set, the dashboard and the whole REST API (logs,
+starting and stopping sources, the dead-scrobble queue, OAuth flows, `/api/metrics`) require
+a login session or an API key created under Settings → Account.
 
-Treat that as wider than a read-only page, because the REST API is a control surface. Without
-credentials a caller can read the full application log (`/api/logs`, and a live stream of it),
-stop and restart scrobbling for any source or client (`/api/client/listen`, `/api/source/init`),
-clear caches, manipulate the dead-scrobble queue, and start an OAuth authorization flow
-(`/api/source/auth`). Source and client secrets are not exposed — `/api/status` and
-`/api/components` report state without credentials in it — but everything above is reachable by
-anyone who can open the address.
+The package sets the password through upstream's environment variables, never by writing to
+its database. When `adminPassword` is set, the daemon gets `ADMIN_RESET_PW=<adminPassword>`.
+Upstream stores an HMAC fingerprint of each reset value it has applied
+(`src/backend/common/auth/ownerPassword.ts`). A new value sets the password and signs out all
+admin sessions. A value it has already applied is ignored, with a warning logged on every
+start (`ADMIN_RESET_PW was NOT applied: this value was already used…`). That warning is
+expected here. So a password changed later in the dashboard survives restarts, and running
+**Set Admin Password** again takes the password back.
 
-**Set Web UI Password** (see [Actions](#actions)) narrows that gap by turning on StartOS's
-reverse-proxy HTTP basic auth (`proxy.auth`) for this binding: unauthenticated requests get
-`401` before they reach the container. It's opt-in and off by default because `proxy.auth`
-gates the whole port with no path scoping, and this interface serves the dashboard, the control
-API, *and* scrobble ingest together. Turning it on also 401s the endpoints push-based sources
-post to without a browser — the WebScrobbler browser extension, ListenBrainz-compatible clients
-(`/api/listenbrainz*`, `/1/submit-listens`), Last.fm-compatible clients (`endpointlfm`), and
-Plex/Tautulli/Jellyfin webhooks — since none of them authenticate with HTTP basic. Pull-based
-sources (Spotify, Subsonic, Last.fm, YouTube Music) are unaffected; multi-scrobbler dials out to
-those rather than being called into. **Clear Web UI Password** turns the gate back off.
+These endpoints stay open after a password is set, and authenticate by their own `token`
+config if anything: ListenBrainz (`/1/*`, `/api/listenbrainz*`), Last.fm (`/2.0/`,
+`/api/lastfm*`), WebScrobbler (`/api/webscrobbler*`), and `/api/health` and `/api/version`.
+**navidrome-startos**'s scrobble-to-multi-scrobbler feature (`ND_LISTENBRAINZ_BASEURL` in its
+`main.ts`) uses `/1/` on the bridge address, so the login doesn't affect it. No StartOS
+`proxy.auth` gate is set on the binding, because that would gate those endpoints too.
 
-**The gate covers every address of this binding, including the plaintext bridge address
-(`10.0.3.1:<port>`) that other StartOS packages resolve with `sdk.host.getBridgeAddress`.** While
-a password is set, those packages get `401` too. **navidrome-startos**'s scrobble-to-multi-scrobbler
-feature (`ND_LISTENBRAINZ_BASEURL` in its `main.ts`) dials that address with Navidrome's
-ListenBrainz client, which always sends its own `Authorization: Token <token>` header and so can
-never answer the basic-auth challenge: scrobbling from Navidrome works only while no password is
-set.
+`SECURE_COOKIES` is forced to `false`. better-auth fixes the cookie's `Secure` flag at startup,
+and upstream turns it on whenever `BASE_URL` is `https`. That would make every login over a
+plain-`http` address (Tor, or the http port) fail silently. `TRUST_PROXY`, `ALLOWED_HOSTS` and
+`AUTH_MODE` are left at upstream defaults: proxy headers aren't trusted, any host is accepted,
+and built-in auth is on.
 
 ## Installation and First-Run Flow
 
-Nothing is skipped and no credentials are generated; multi-scrobbler has no setup wizard and
-no login.
+A new install asks for two things. The first is the admin password: a **critical** task
+blocks the service from starting until **Set Admin Password** has run. Upstream's own `/setup`
+page and setup token are never needed.
 
-The one thing a new install asks for is a callback address. `BASE_URL` is what multi-scrobbler
+The second is a callback address. `BASE_URL` is what multi-scrobbler
 builds its OAuth redirect URIs from, and it must be an address the browser completing that
 provider's authorization can actually reach — so a fresh install raises the **Set Callback
 Address** task. The service runs before it is answered, on the fallback address described in
-[File Models](#file-models). Everything else is upstream-managed: `PORT`, `CONFIG_DIR`, `DATA_DIR`, `PUID`,
-`PGID`, `TZ`, and `BASE_URL` come from StartOS; sources, clients, retention, and caching all
+[File Models](#file-models). Everything else is upstream-managed: `PORT`, `CONFIG_DIR`, `DATA_DIR`, `TZ`,
+`BASE_URL`, `SECURE_COOKIES`, and `ADMIN_RESET_PW` come from StartOS; sources, clients, retention, and caching all
 come from `config.json` or additional environment variables.
 
 On first boot the application creates its database on its own. Sources that use OAuth are
@@ -161,8 +171,8 @@ authorized afterwards, from a link the dashboard shows for each one.
 
 ## Actions
 
-Five actions: one address choice, one configuration editor, one lookup, and a pair that
-toggle the web UI password gate.
+Four actions: one address choice, one configuration editor, one lookup, and the admin
+password.
 
 - **Set Callback Address** (`set-base-url`) — run it when the address OAuth providers should
   redirect back to is wrong for where you browse from: over a tunnel, over Tor, or on a
@@ -188,24 +198,22 @@ toggle the web UI password gate.
   is the internal one that avoids both. Returns an informational result rather than an error
   when Maloja is absent or stopped.
 
-- **Set Web UI Password** (`set-web-ui-password`) — generates a random password, writes it to
-  `store.json` as `uiPassword`, and returns the username (`admin`, fixed) and password as a
-  one-time-viewable credential pair. While a password is set, its warning says that running
-  it replaces that password. `setInterfaces` (`interfaces.ts`) reads `uiPassword`
-  reactively via `.const(effects)` and passes it as StartOS reverse-proxy basic auth
-  (`proxy.auth`) on the web interface binding, so the gate takes effect without a restart.
-  Re-running it rotates the password. Its warning names the push-based source types that stop
-  working while it's on, and its description notes that it blocks other StartOS packages
-  reaching this service over the bridge as well, Navidrome's scrobble feed included — see
-  [Network Access and Interfaces](#network-access-and-interfaces).
-
-- **Clear Web UI Password** (`clear-web-ui-password`) — merges `uiPassword` back to `undefined`
-  in `store.json`, which drops `proxy.auth` on the next `setInterfaces` pass and returns the
-  interface to no authentication. It asks for confirmation first.
+- **Set Admin Password** (`set-admin-password`) — generates a random 24-character password,
+  writes it to `store.json` as `adminPassword`, and returns the username (`admin`) and password
+  as a credential pair you can view once. The daemon restarts and applies the password through
+  `ADMIN_RESET_PW`, signing the admin out in every browser. Once a password is stored, the
+  action warns before replacing it. Run it again to rotate the password or to recover a
+  forgotten one, including one changed in the dashboard. The username shown is always `admin`.
+  If it was renamed in the dashboard, the new name is logged at startup, partly redacted
+  (`Dashboard and API are secured. Admin username: …`).
 
 ## Tasks
 
-One task.
+Two tasks.
+
+- **Set Admin Password** — `critical`: the service won't start until it's done. Raised from
+  `setupOnInit` while `adminPassword` is unset, which is every fresh install and every update
+  from a release before 0.21.1:0 that had no web UI password. It clears when the action runs.
 
 - **Set Callback Address** — `important`, so it is surfaced prominently but never blocks the
   service. Raised while `baseUrl` is unset — so on every fresh install — or its hostname is no
@@ -233,7 +241,9 @@ travel together.
 
 Nothing is deliberately excluded. Because the credential files are captured as-is, a restored
 instance comes back with its OAuth sources still authorized and needs no re-authorization;
-because `store.json` comes with it, the callback address is the one that was chosen. If the
+because `store.json` comes with it, the callback address is the one that was chosen. The admin
+password comes back with the database, and the stored `adminPassword` matches the reset
+fingerprint in it, so restore doesn't reset the password. If the
 interface is assigned a fresh external port on reinstall, `BASE_URL` follows the stored
 hostname to it. Only a hostname that no longer exists on the restored server raises the
 **Set Callback Address** task.
@@ -247,7 +257,9 @@ Three things behave differently here than they would running the image yourself.
    which the default mDNS address does not satisfy off the LAN. Choosing a reachable address
    is the general fix; overriding `redirectUri` on the individual source or client in
    `config.json` handles the case where different providers need different addresses.
-2. `PUID`/`PGID` are fixed at `1000:1000` rather than user-configurable.
+2. The container user is fixed at the image's `65532:65532`, and the admin password is
+   generated by **Set Admin Password**. It can't be typed in, though it can be changed later
+   in the dashboard.
 3. **Edit config.json** validates only the outer JSON shape, not the fields of individual
    source and client entries, so a configuration that is well-formed but wrong is accepted
    and fails later at the application level.
@@ -261,6 +273,7 @@ package_id: multi-scrobbler
 image: foxxmd/multi-scrobbler
 architectures: [x86_64, aarch64]
 subcontainers: [multi-scrobbler-sub]
+oneshots: [chown]
 volumes:
   config: /config
   startos: null
@@ -272,10 +285,10 @@ startos_managed_env_vars:
   - PORT
   - CONFIG_DIR
   - DATA_DIR
-  - PUID
-  - PGID
   - TZ
   - BASE_URL
+  - SECURE_COOKIES
+  - ADMIN_RESET_PW
 dependencies:
   - maloja (optional; enabled while a Maloja client or source is configured)
 interfaces:
@@ -284,9 +297,9 @@ actions:
   - set-base-url
   - edit-config
   - maloja-connection-info
-  - set-web-ui-password
-  - clear-web-ui-password
+  - set-admin-password
 tasks:
+  - { action: set-admin-password, severity: critical }
   - { action: set-base-url, severity: important }
 health_checks:
   - multi-scrobbler
