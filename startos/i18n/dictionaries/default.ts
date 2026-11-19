@@ -27,18 +27,15 @@ const dict = {
   'Choose which of this service’s addresses Spotify, Last.fm, and other authorization flows should send your browser back to.': 18,
   // init/primaryUrlTask.ts
   'Choose the address Spotify, Last.fm, and other authorization flows send your browser back to.': 19,
-  // actions/setWebUiPassword.ts
-  'Set Web UI Password': 20,
-  'Gate the web interface behind a username and password, enforced by the StartOS reverse proxy. It also blocks other services on this server, including Navidrome’s scrobble feed, which can’t send the login; clear the password to use them.': 21,
-  'This locks the whole web interface port, including the endpoints push-based sources send scrobbles to without a browser: the WebScrobbler browser extension, ListenBrainz-compatible clients, Last.fm-compatible clients, and Plex/Tautulli/Jellyfin webhooks. Any of those already configured will stop working until you point them at credentials that support basic auth, or run Clear Web UI Password. Pull-based sources (Spotify, Subsonic, Last.fm, YouTube Music) are unaffected.': 22,
-  'Web UI Login': 23,
-  'Use these credentials to sign in to the web interface. Run Clear Web UI Password to turn the gate back off.': 24,
-  Username: 25,
+  // actions/setAdminPassword.ts
+  'Set Admin Password': 20,
+  'Generate a new random password for the dashboard’s admin account. Replaces any existing password, including one changed in the dashboard.': 21,
+  'Replaces the current admin password and signs the admin out in every browser. Multi-Scrobbler restarts to apply it.': 22,
+  'Admin Password': 23,
+  'Sign in with this password and your current username (admin unless changed in the dashboard). The password-reset message in the service logs shows the current username. Scrobble endpoints such as ListenBrainz, Last.fm and WebScrobbler do not use this login.': 24,
   Password: 26,
-  'Clear Web UI Password': 27,
-  'Turn off the web interface password gate. The interface goes back to having no authentication.': 28,
-  'Replaces the current web interface password with a new one. The old password stops working, and anything signing in with it must be given the new one.': 29,
-  'Removes the login from the web interface. Anyone who can reach one of its addresses can use the dashboard and its API again without a password.': 30,
+  // init/adminPasswordTask.ts
+  'Set an admin password: until one is set, anyone who can reach the dashboard can control it.': 27,
 } as const
 
 /**

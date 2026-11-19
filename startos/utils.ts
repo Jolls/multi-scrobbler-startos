@@ -6,6 +6,5 @@ export const uiPort = 9078
 // reachable from here lands in that package's bundle.
 export const uiHostId = 'ui'
 
-// Username for the optional web UI basic-auth gate (see actions/setWebUiPassword.ts). Fixed
-// rather than user-chosen: the gate gets set up once per package, not once per person.
-export const uiUsername = 'admin'
+// The uid:gid the distroless image runs as (its USER); the chown oneshot hands /config to it.
+export const appUid = 65532
