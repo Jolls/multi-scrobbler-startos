@@ -36,6 +36,13 @@ const dict = {
   Password: 26,
   // init/adminPasswordTask.ts
   'Set an admin password: until one is set, anyone who can reach the dashboard can control it.': 27,
+  // actions/pruneDbBackups.ts
+  'Delete Old Database Backups': 28,
+  'Delete all but the newest of the database copies Multi-Scrobbler saves before each upgrade. These copies are also included in every StartOS backup, so they add to its size.': 29,
+  'Deleted copies can only be recovered from a StartOS backup taken before you run this.': 30,
+  'Database Backups': 31,
+  'Nothing to delete: there is no more than one database backup.': 32,
+  'Deleted ${count} older database backups and freed ${size} MB. The newest, from ${date}, was kept.': 33,
 } as const
 
 /**
