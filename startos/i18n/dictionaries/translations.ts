@@ -35,6 +35,7 @@ export default {
     31: 'Copias de la base de datos',
     32: 'Nada que eliminar: no hay más de una copia de la base de datos.',
     33: 'Se eliminaron ${count} copias antiguas de la base de datos y se liberaron ${size} MB. Se conservó la más reciente, del ${date}.',
+    34: 'No se pudo verificar la copia más reciente de la base de datos. No se eliminó ninguna copia.',
   },
   de_DE: {
     0: 'Weboberfläche',
@@ -70,6 +71,7 @@ export default {
     31: 'Datenbanksicherungen',
     32: 'Nichts zu löschen: Es gibt höchstens eine Datenbanksicherung.',
     33: '${count} ältere Datenbanksicherungen gelöscht und ${size} MB freigegeben. Die neueste vom ${date} wurde behalten.',
+    34: 'Die neueste Datenbanksicherung konnte nicht überprüft werden. Es wurden keine Sicherungen gelöscht.',
   },
   pl_PL: {
     0: 'Interfejs webowy',
@@ -105,6 +107,7 @@ export default {
     31: 'Kopie bazy danych',
     32: 'Nie ma czego usuwać: istnieje najwyżej jedna kopia bazy danych.',
     33: 'Usunięto starsze kopie bazy danych (${count}) i zwolniono ${size} MB. Zachowano najnowszą, z ${date}.',
+    34: 'Nie udało się zweryfikować najnowszej kopii bazy danych. Nie usunięto żadnej kopii.',
   },
   fr_FR: {
     0: 'Interface web',
@@ -140,5 +143,6 @@ export default {
     31: 'Sauvegardes de la base de données',
     32: 'Rien à supprimer : il n’y a pas plus d’une sauvegarde de la base de données.',
     33: '${count} anciennes sauvegardes de la base de données supprimées, ${size} Mo libérés. La plus récente, du ${date}, a été conservée.',
+    34: 'La sauvegarde la plus récente de la base de données n’a pas pu être vérifiée. Aucune sauvegarde n’a été supprimée.',
   },
 } satisfies Record<string, LangDict>

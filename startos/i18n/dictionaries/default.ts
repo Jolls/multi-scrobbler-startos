@@ -43,6 +43,7 @@ const dict = {
   'Database Backups': 31,
   'Nothing to delete: there is no more than one database backup.': 32,
   'Deleted ${count} older database backups and freed ${size} MB. The newest, from ${date}, was kept.': 33,
+  'The newest database backup could not be verified. No backups were deleted.': 34,
 } as const
 
 /**

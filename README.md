@@ -146,11 +146,14 @@ expected here. So a password changed later in the dashboard survives restarts, a
 
 These endpoints stay open after a password is set: ListenBrainz (`/1/*`,
 `/api/listenbrainz*`), Last.fm (`/2.0/`, `/api/lastfm*`), WebScrobbler (`/api/webscrobbler*`),
-and `/api/health` and `/api/version`. The three scrobble endpoints identify the sending source
-by its own config instead: `token` or `slug` (ListenBrainz), `apiKey` or `slug` (Last.fm),
-`slug` (WebScrobbler). Since upstream 0.21.3 a request is dropped unread when no source of
-that kind is configured. A source with none of these fields is deprecated: it still catches
-unmatched requests, but logs a warning, and upstream says a future release will reject it.
+and `/api/health` and `/api/version`. ListenBrainz matches the source's `data.token` and/or
+`data.slug`; WebScrobbler matches `data.slug`. Last.fm matches `data.slug` before reading the
+body, then uses `data.apiKey` to select among matching sources. An absent or unknown API key
+falls back to the first matching source: an API key is not an access-control gate. To restrict
+Last.fm submissions, configure a slug and use `/api/lastfm/<slug>` as the client's base URL.
+Since upstream 0.21.3 a scrobble request is dropped unread when no source of that kind is
+configured. A source with none of these fields is deprecated: it still catches unmatched
+requests, but logs a warning, and upstream says a future release will reject it.
 **navidrome-startos**'s scrobble-to-multi-scrobbler feature (`ND_LISTENBRAINZ_BASEURL` in its
 `main.ts`) uses `/1/` on the bridge address, so the login doesn't affect it. No StartOS
 `proxy.auth` gate is set on the binding, because that would gate those endpoints too.
@@ -222,10 +225,12 @@ password, and a cleanup.
   how many it removed and the space freed. Upstream writes these with SQLite's online backup
   API before each migrating upgrade, and never reads, rotates or removes them (see
   [Volume and Data Layout](#volume-and-data-layout)); each StartOS backup carries all of them.
-  A backup is written in place during startup, so if the newest was modified in the last ten
-  minutes the one before it is kept too. The unsuffixed `ms.db.bak`, which upstream restores
-  from when `ms.db` is missing, is never touched. It never touches `ms.db` itself and needs no
-  restart, so it runs in any state. To roll back by hand, stop the service, delete `ms.db`
+  Stop the service before running it: upstream writes the copies in place during startup.
+  The action opens the newest copy read-only with the image's SQLite runtime, requires a
+  non-empty schema and a successful `PRAGMA quick_check`, and deletes nothing if validation
+  fails. The unsuffixed `ms.db.bak`, which upstream restores from when `ms.db` is missing,
+  is never touched. It never touches `ms.db` itself or restarts the service; start it again
+  after cleanup. To roll back by hand, stop the service, delete `ms.db`
   and rename the kept copy to `ms.db.bak`. A deleted copy survives only in StartOS backups taken
   before the action ran. With one copy or none it reports there is nothing to delete.
 
